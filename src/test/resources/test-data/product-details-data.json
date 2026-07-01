@@ -1,0 +1,20 @@
+{
+  "product":
+  {
+    "name": "Blue Top",
+    "price": "Rs. 500",
+    "quantity": "2",
+    "totalPrice": "Rs. 1000"
+  },
+  "review":
+  {
+    "name": "AutomationTester",
+    "email": "AutomationTester@example.com",
+    "review": "This is a great product!"
+  },
+
+  "messages":
+  {
+    "thanksForReview": "Thank you for your review."
+  }
+}
