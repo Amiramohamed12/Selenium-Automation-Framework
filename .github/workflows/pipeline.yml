@@ -1,34 +1,60 @@
-name: Run Rest Assured Project
+name: Run UI Tests
 
 on:
   push:
     branches:
       - main
-
+  workflow_dispatch:
 
 jobs:
   test:
     runs-on: ubuntu-latest
+
     steps:
-      - name: checkout Code
+      - name: Checkout Code
         uses: actions/checkout@v5
 
-      - name: setup java
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu' # See 'Supported distributions' for available options
+          distribution: zulu
           java-version: '17'
+          cache: maven
 
-      - name: setup maven
+      - name: Setup Maven
         uses: stCarolas/setup-maven@v5
         with:
           maven-version: 3.9.16
 
-      - name: Running Tests
-        run: mvn -DexecutionType="LocalHeadless" -DbrowserType="edge" clean test
+      - name: Verify Java & Maven
+        run: |
+          java -version
+          mvn -version
 
-      - name: Upload Test Results
+      - name: Run Tests
+        run: >
+          mvn clean test
+          -DexecutionType=LocalHeadless
+          -DbrowserType=Edge
+          -e
+
+      - name: Upload Surefire Reports
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: RestAssuredTestResults
-          path: "test-output/reports/*.html"
+          name: Surefire-Reports
+          path: test-output/target/surefire-reports/**
+
+      - name: Upload Allure Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Allure-Results
+          path: test-output/allure-results/**
+
+      - name: Upload Screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Screenshots
+          path: test-output/screenshots/**
