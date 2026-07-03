@@ -3,7 +3,8 @@ name: Run Rest Assured Project
 on:
   push:
     branches:
-      - master
+      - main
+
 
 jobs:
   test:
