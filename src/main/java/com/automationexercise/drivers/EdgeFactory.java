@@ -16,11 +16,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class EdgeFactory extends AbstractDriver {
-    private EdgeOptions getOptions(){
-        EdgeOptions options=new EdgeOptions();
+    private EdgeOptions getOptions() {
+        EdgeOptions options = new EdgeOptions();
+        options.addArguments("--remote-allow-origins=*");
         options.addArguments("--disable-notifications");
-        options.addArguments("--start-maximized");
         options.addArguments("--disable-popup-blocking");
+        options.addArguments("--disable-infobars");
+        options.addArguments("--start-maximized");
         Map<String, Object> prefs = new HashMap<>();
         String userDir = System.getProperty("user.dir");
         String downloadPath = userDir + "\\src\\test\\resources\\downloads";
@@ -34,36 +36,31 @@ public class EdgeFactory extends AbstractDriver {
         options.setCapability(CapabilityType.ENABLE_DOWNLOADS, true);
         options.setAcceptInsecureCerts(true);
         options.setPageLoadStrategy(PageLoadStrategy.EAGER);
-        if(PropertyReader.getProperty("executionType").equalsIgnoreCase("LocalHeadless")||
-                PropertyReader.getProperty("executionType").equalsIgnoreCase("Remote"))
-            options.addArguments("--headless");
-        options.addArguments("--disable-infobars");
-        options.addArguments("--disable-extensions");
-        options.addArguments("--disable-gpu");
+        if (PropertyReader.getProperty("executionType").equalsIgnoreCase("Local") ||
+                PropertyReader.getProperty("executionType").equalsIgnoreCase("LocalHeadless")) {
+            options.addArguments("--headless");}
+
         return options;
-
     }
-    public WebDriver createDriver() {
-        if(PropertyReader.getProperty("executionType").equalsIgnoreCase("Local")||
-                PropertyReader.getProperty("executionType").equalsIgnoreCase("LocalHeadlees"))
-            return new EdgeDriver(getOptions());
 
-        else if(PropertyReader.getProperty("executionType").equalsIgnoreCase("Remote")){
+    @Override
+    public WebDriver createDriver() {
+        if (PropertyReader.getProperty("executionType").equalsIgnoreCase("Local") ||
+                PropertyReader.getProperty("executionType").equalsIgnoreCase("LocalHeadless")) {
+            return new EdgeDriver(getOptions());
+        } else if (PropertyReader.getProperty("executionType").equalsIgnoreCase("Remote")) {
             try {
                 return new RemoteWebDriver(
                         new URI("http://" + remoteHost + ":" + remotePort + "/wd/hub").toURL(), getOptions()
                 );
             } catch (Exception e) {
-                LogsManager.error("Error creating RemoteWebDriver: " , e.getMessage());
+                LogsManager.error("Error creating RemoteWebDriver: " + e.getMessage());
                 throw new RuntimeException("Failed to create RemoteWebDriver", e);
             }
-        }
 
-        else{
-            LogsManager.error("Invalid execution type");
+        } else {
+            LogsManager.error("Invalid execution type: " + PropertyReader.getProperty("executionType"));
             throw new IllegalArgumentException("Invalid execution type: " + PropertyReader.getProperty("executionType"));
         }
     }
-
-    }
-
+}
