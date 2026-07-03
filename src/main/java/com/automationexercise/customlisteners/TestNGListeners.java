@@ -25,26 +25,41 @@ public class TestNGListeners implements IInvokedMethodListener, IExecutionListen
         }
     }
 
+
     public void afterInvocation(IInvokedMethod method, ITestResult testResult) {
-        WebDriver driver = null;
-        if (method.isTestMethod())
-        {
+
+            if (!method.isTestMethod())
+                return;
+
             ScreenrecordManager.stopRecording(testResult.getName());
             Validation.assertAll(testResult);
-            if (testResult.getInstance() instanceof WebDriverProvider provider)
-                driver = provider.getWebDriver(); //initialize driver from WebDriverProvider
-            switch (testResult.getStatus()){
-                case ITestResult.SUCCESS -> ScreenshotManager.takeFullPageScreenshot(driver,"passed-" + testResult.getName());
-                case ITestResult.FAILURE -> ScreenshotManager.takeFullPageScreenshot(driver,"failed-" + testResult.getName());
-                case ITestResult.SKIP -> ScreenshotManager.takeFullPageScreenshot(driver,"skipped-" + testResult.getName());
+
+            WebDriver driver = null;
+
+            if (testResult.getInstance() instanceof WebDriverProvider provider) {
+                try {
+                    driver = provider.getWebDriver();
+                } catch (Exception e) {
+                    LogsManager.warn("WebDriver is not initialized. Skipping screenshot.");
+                }
+            }
+
+            if (driver != null) {
+                switch (testResult.getStatus()) {
+                    case ITestResult.SUCCESS ->
+                            ScreenshotManager.takeFullPageScreenshot(driver, "passed-" + testResult.getName());
+
+                    case ITestResult.FAILURE ->
+                            ScreenshotManager.takeFullPageScreenshot(driver, "failed-" + testResult.getName());
+
+                    case ITestResult.SKIP ->
+                            ScreenshotManager.takeFullPageScreenshot(driver, "skipped-" + testResult.getName());
+                }
             }
 
             AllureAttachmentManager.attachLogs();
             AllureAttachmentManager.attachRecords(testResult.getName());
         }
-
-
-    }
 
 
 public void onExecutionStart() {
