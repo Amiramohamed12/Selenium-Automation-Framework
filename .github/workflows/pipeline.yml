@@ -17,7 +17,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu' # See 'Supported distributions' for available options
-          java-version: '25'
+          java-version: '17'
 
       - name: setup maven
         uses: stCarolas/setup-maven@v5
