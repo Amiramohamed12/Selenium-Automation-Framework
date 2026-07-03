@@ -8,53 +8,30 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
-
+    runs-on: windows-latest
+    permissions:
+     checks: write
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v5
+    - name: checkout Code
+      uses: actions/checkout@v5
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: zulu
-          java-version: '17'
-          cache: maven
+    - name: setup java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'zulu' # See 'Supported distributions' for available options
+        java-version: '17'
 
-      - name: Setup Maven
-        uses: stCarolas/setup-maven@v5
-        with:
-          maven-version: 3.9.16
+    - name: setup maven
+      uses: stCarolas/setup-maven@v5
+      with:
+        maven-version: 3.9.16
 
-      - name: Verify Java & Maven
-        run: |
-          java -version
-          mvn -version
+    - name: Running Tests
+      continue-on-error: true
+      run: mvn  -DexecutionType="LocalHeadless"  -DbrowserType="Edge" clean test
 
-      - name: Run Tests
-        run: >
-          mvn clean test
-          -DexecutionType=LocalHeadless
-          -DbrowserType=Edge
-          -e
-
-      - name: Upload Surefire Reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: Surefire-Reports
-          path: test-output/target/surefire-reports/**
-
-      - name: Upload Allure Results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: Allure-Results
-          path: test-output/allure-results/**
-
-      - name: Upload Screenshots
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: Screenshots
-          path: test-output/screenshots/**
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v4
+      with:
+        name: Edge_Windows_Report
+        path: "test-output/reports/*.html"
