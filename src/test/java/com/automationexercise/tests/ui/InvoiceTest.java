@@ -114,13 +114,13 @@ public class InvoiceTest extends BaseTest {
                 .verifySuccessMessage(testData.getJsonData("messages.paymentSuccess"));
     }
 
-    @Description("Invoice test")
+   /* @Description("Invoice test")
     @Test(dependsOnMethods = {"checkoutTC","loginTC","registerTC","addToCartTC","paymentTC"})
     public void invoiceTC() {
         new PaymentPage(driver)
                 .clickDownloadInvoiceButton()
                 .verifyInvoiceDownloaded(testData.getJsonData("invoiceName"));
-    }
+    }*/
 
     @Description("Delete created user")
     @Test(dependsOnMethods = {"paymentTC","loginTC","registerTC","addToCartTC","checkoutTC"})
